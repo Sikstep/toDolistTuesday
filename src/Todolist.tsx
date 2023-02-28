@@ -46,7 +46,7 @@ const TodoList: FC<TodoListPropsType> = (props) => {
     const addTask = () => {
         const trimmedTitle = title.trim()
         if(trimmedTitle){
-            props.addTask(trimmedTitle)
+            props.addTask(trimmedTitle, props.todoListId)
         } else {
             setError(true)
         }
@@ -54,7 +54,10 @@ const TodoList: FC<TodoListPropsType> = (props) => {
     }
     const onKeyDownAddTask = (e: KeyboardEvent<HTMLInputElement>)=> e.key === "Enter" && addTask()
 
-    const handlerCreator = (filter: FilterValuesType):() => void => (): void => props.changeFilterValue(filter)
+    const handlerCreator = (filter: FilterValuesType) => () =>  props.changeTodoListFilter(filter, props.todoListId);   // новый синтаксис вызова функции для создания функций с
+    const removeTodoList = () => {
+        props.removeTodoList(props.todoListId);
+    };
 
 
     const inputErrorClasses = error || isUserMessageToLong ? "input-error" : ""
@@ -63,7 +66,9 @@ const TodoList: FC<TodoListPropsType> = (props) => {
     const isAddBtnDisabled = title.length === 0
     return (
         <div className={"todolist"}>
-            <h3>{props.title}</h3>
+            <h3>{props.title}
+            <button onClick={removeTodoList}>X</button>
+            </h3>
             <div>
                 {/*<input ref={addTaskInput}/>*/}
                 {/*<button onClick={addTask}>+</button>*/}
@@ -79,6 +84,7 @@ const TodoList: FC<TodoListPropsType> = (props) => {
                 {userErrorMessage}
             </div>
             <TasksList
+                todoListId={props.todoListId}
                 tasks={props.tasks}
                 removeTask={props.removeTask}
                 changeTaskStatus={props.changeTaskStatus}
