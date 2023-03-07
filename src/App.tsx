@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import './App.css';
 import TodoList, {TaskType} from './TodoList';
 import {v1} from 'uuid';
+import {AddItemForm} from './AddItemForm';
 
 
 // CRUD
@@ -9,7 +10,7 @@ import {v1} from 'uuid';
 
 export type FilterValuesType = 'all' | 'active' | 'completed'
 
-type TodoListType = {
+export type TodoListType = {
     id: string
     title: string
     filter: FilterValuesType
@@ -77,12 +78,27 @@ function App(): JSX.Element {
         setTasks({...tasks, [todoListId]: tasks[todoListId].map(el => el.id === taskId ? {...el, isDone: newIsDone} : el)})
     }
 
+    const changeTaskTitle = (taskID: string, newTitle: string, todoListID: string) => {
+        setTasks({...tasks, [todoListID]: tasks[todoListID].map(t => t.id === taskID ? {...t, title: newTitle} : t)})
+    }
 
-
+    const changeTodoListTitle = (title: string, todolistID: string) => {
+        setTodoLists(todoLists.map(tl => tl.id === todolistID ? {...tl, title:title} : tl))
+    }
+    
     const changeTodoListFilter = (filter: FilterValuesType, todoListId: string) => {
         setTodoLists(todoLists.map(el => el.id === todoListId ? {...el, filter: filter} : el))
     }
-
+    const addTodoList = (title: string) => {
+        const newTodoListID = v1();
+        const newTodoList: TodoListType = {
+            id: newTodoListID,
+            title: title,
+            filter: 'all'
+        }
+        setTodoLists([newTodoList, ...todoLists]);
+        setTasks({...tasks, [newTodoListID]: []})
+    }
     const removeTodoList = (todoListId: string) => {
         setTodoLists(todoLists.filter(el => el.id !== todoListId));
         // delete tasks[todoListId]; мутабельно!
@@ -94,9 +110,9 @@ function App(): JSX.Element {
     const getFilteredTasks = (tasks: Array<TaskType>, filter: FilterValuesType): Array<TaskType> => {
         switch (filter) {
             case 'active':
-                return tasks.filter(t => t.isDone === false)
+                return tasks.filter(t => !t.isDone)
             case 'completed':
-                return tasks.filter(t => t.isDone === true)
+                return tasks.filter(t => t.isDone)
             default:
                 return tasks
         }
@@ -115,9 +131,12 @@ function App(): JSX.Element {
                 removeTask={removeTask}
                 addTask={addTask}
                 changeTaskStatus={changeTaskStatus}
+                changeTaskTitle={changeTaskTitle}
 
                 changeTodoListFilter={changeTodoListFilter}
                 removeTodoList={removeTodoList}
+                changeTodoListTitle={changeTodoListTitle}
+
             />
         )
     })
@@ -125,6 +144,7 @@ function App(): JSX.Element {
     //UI:
     return (
         <div className="App">
+            <AddItemForm maxLengthUserMessage={15} addNewItem={addTodoList}/>
             {todolistsComponents}
         </div>
     );

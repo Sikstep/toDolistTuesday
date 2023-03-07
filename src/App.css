@@ -7,9 +7,11 @@
   margin-right: 50px;
 }
 .todolist {
+  height: max-content;
   border: 2px solid hotpink;
   border-radius:  5px;
   padding: 20px;
+  background-color: #f2f2f2;
 }
 
 .task {
